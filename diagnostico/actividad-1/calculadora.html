@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>CALCULADORA</title>
+
+        <style>
+            .display{
+                width: 18%;
+                height: 35px;
+                font-size: 24px;
+                text-align: right;
+                padding: 10px; 
+                margin-bottom: 5px; 
+                margin-left: 10px;
+                border-radius: 8px; 
+                border: 2px solid #000080;
+                background-color: #e6f0ff;
+                box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+            }
+            
+            .button{
+                color: white;
+                font-family: Arial, Helvetica, sans-serif;
+                font-weight: bold;
+                font-size: 20px;
+                
+                background-color:blue ;
+                box-shadow: 0px 5px rgb(1, 1, 59);
+
+                width: 100%;
+                height:  60px;
+
+                border-radius: 6px;
+                border-color: white;
+                margin: 5px 10px;
+            }  
+            
+            .buttonOperacion{
+                color: white;
+                font-family: Arial, Helvetica, sans-serif;
+                font-weight: bold;
+                font-size: 20px;
+                
+                background-color:rgb(10, 133, 10) ;
+                box-shadow: 0px 5px rgb(2, 59, 14);
+
+                width: 100%;
+                height:  60px;
+
+                border-radius: 6px;
+                border-color: white;
+                margin: 5px 10px;
+            }
+
+            .buttonBorrar {
+                color: white;
+                font-family: Arial, Helvetica, sans-serif;
+                font-weight: bold;
+                font-size: 20px;
+                
+                background-color:red ;
+                box-shadow: 0px 5px rgb(99, 3, 3);
+
+                width: 20%;
+                height:  60px;
+
+                border-radius: 6px;
+                border-color: white;
+                margin: 5px 5px;
+            }
+
+            .buttonIgual{
+                color: white;
+                font-family: Arial, Helvetica, sans-serif;
+                font-weight: bold;
+                font-size: 20px;
+                
+                background-color:rgba(202, 202, 4, 0.836) ;
+                box-shadow: 0px 5px rgb(226, 226, 44);
+
+                width: 100%;
+                height:  60px;
+
+                border-radius: 6px;
+                border-color: white;
+                margin: 5px 10px;
+            }
+
+            body {
+              background-color: lightblue;
+            }
+            h1 {
+              color: navy;
+            }
+          </style>
+    </head>
+
+    <body>
+            <td><input id = "display" type = "text" readonly class="display"></td>
+    <table>
+        <tr>
+            <td><button id = "button7" class = "button"> 7 </button></td>
+            <td><button id = "button8" class = "button"> 8 </button></td>
+            <td><button id = "button9" class = "button"> 9 </button></td>
+            <td><button id = "buttonSumar" class = "buttonOperacion"> + </button></td>
+        </tr>
+        <tr>
+            <td><button id = "button4" class = "button"> 4 </button></td>
+            <td><button id = "button5" class = "button"> 5 </button></td>
+            <td><button id = "button6" class = "button"> 6 </button></td>
+            <td> <button id = "buttonMenos" class = "buttonOperacion"> - </button></td>
+        </tr>
+        <tr>
+            <td><button id = "button3" class = "button"> 3 </button></td>
+            <td><button id = "button2" class = "button"> 2 </button></td>
+            <td><button id = "button1" class = "button"> 1 </button></td>
+            <td><button id = "buttonMultiplicacion" class = "buttonOperacion"> * </button></td>
+        </tr>
+        <tr>
+            <td><button id = "button0" class = "button"> 0 </button></td>
+            <td><button id = "buttonPunto" class = "button"> . </button></td>
+            <td><button id = "buttonIgual" class = "buttonIgual"> = </button></td>
+            <td><button id = "buttonDivision" class = "buttonOperacion"> / </button></td>
+            
+        </tr>
+    </table>
+            <td><button id = "buttonBorrar" class = "buttonBorrar"> Borrar </button></td>
+    </body>
+
+    <script>
+
+        function presionar(valor) {
+        document.getElementById("display").value += valor;
+        }
+
+        function borrar() {
+        document.getElementById('display').value = '';
+        }
+
+
+
+        function calcular(tokens) {
+        
+        let i = 0;
+        while (i < tokens.length) {
+            if (tokens[i] === "*" || tokens[i] === "/") {
+            let num1 = Number(tokens[i - 1]);
+            let num2 = Number(tokens[i + 1]);
+            let resultado = tokens[i] === "*" ? num1 * num2 : num1 / num2;
+            tokens.splice(i - 1, 3, resultado.toString());
+            i = 0; 
+            } else {
+            i++;
+            }
+        }
+
+
+        i = 0;
+        while (i < tokens.length) {
+            if (tokens[i] === "+" || tokens[i] === "-") {
+            let num1 = Number(tokens[i - 1]);
+            let num2 = Number(tokens[i + 1]);
+            let resultado = tokens[i] === "+" ? num1 + num2 : num1 - num2;
+            tokens.splice(i - 1, 3, resultado.toString());
+            i = 0;
+            } else {
+            i++;
+            }
+        }
+
+        return tokens[0];
+        }
+
+        
+        function resolver() {
+        let expresion = document.getElementById('display').value;
+
+
+        let tokens = expresion.match(/(\d+\.?\d*|\+|\-|\*|\/)/g);
+
+        if (tokens === null) {
+            document.getElementById('display').value = "Error";
+            return;
+        }
+
+        let resultado = calcular(tokens);
+        document.getElementById('display').value = resultado;
+        }
+
+
+        document.getElementById("button7").addEventListener("click", function() { presionar("7"); });
+        document.getElementById("button8").addEventListener("click", function() { presionar("8"); });
+        document.getElementById("button9").addEventListener("click", function() { presionar("9"); });
+        document.getElementById("buttonSumar").addEventListener("click", function() { presionar("+"); });
+
+        document.getElementById("button4").addEventListener("click", function() { presionar("4"); });
+        document.getElementById("button5").addEventListener("click", function() { presionar("5"); });
+        document.getElementById("button6").addEventListener("click", function() { presionar("6"); });
+        document.getElementById("buttonMenos").addEventListener("click", function() { presionar("-"); });
+
+        document.getElementById("button3").addEventListener("click", function() { presionar("3"); });
+        document.getElementById("button2").addEventListener("click", function() { presionar("2"); });
+        document.getElementById("button1").addEventListener("click", function() { presionar("1"); });
+        document.getElementById("buttonMultiplicacion").addEventListener("click", function() { presionar("*"); });
+
+        document.getElementById("button0").addEventListener("click", function() { presionar("0"); });
+        document.getElementById("buttonPunto").addEventListener("click", function() { presionar("."); });
+        document.getElementById("buttonIgual").addEventListener("click", function() { resolver(); });
+        document.getElementById("buttonDivision").addEventListener("click", function() { presionar("/"); });
+
+        document.getElementById("buttonBorrar").addEventListener("click", function() { borrar(); });
+
+    </script>
+    
+</html>
