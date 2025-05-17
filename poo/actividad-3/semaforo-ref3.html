@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8" />
+<title></title>
+
+
+
+<style type="text/css">
+
+.luzroja
+{
+	background-color: red;
+	color:white;
+}
+
+.luzamarilla
+{
+	background-color: yellow;
+	color:black;
+}
+
+.luzverde
+{
+	background-color: green;
+	color:white;
+}
+
+.luzapagada
+{
+	background-color: white;
+	color:black;
+}
+
+.canvas 
+{
+    border:1px solid #d3d3d3;
+    background-color: #f1f1f1;
+}
+</style>
+</head>
+<body>
+
+<button id="red">LuzRoja</button>
+<button id="yellow">LuzAmarilla</button>
+<button id="green">LuzVerde</button>
+
+<button id="on">Encender</button>
+<button id="off">Apagar</button>
+
+
+
+<script type="text/javascript">
+	
+/*Semáforo (prioridad): Desarrolle el modelo del objeto conceptual y su representación 
+gráfica correspondiente (HTML/CSS/JS)*/
+
+class SemaphoreView
+{
+	constructor( model )
+	{
+		this._model = model;
+	
+		this._model.addEventListener( 'changed', ()=> this.updateView() );
+
+		this.updateView();
+		
+	}
+
+	updateView()
+	{
+		let state = this._model.getModelState();
+
+		document.getElementById('red').style.backgroundColor = 'white';
+		document.getElementById('yellow').style.backgroundColor = 'white';
+		document.getElementById('green').style.backgroundColor = 'white';
+
+		if ( state.red )
+		{
+			document.getElementById('red').style.backgroundColor = 'red';
+		}
+
+		if ( state.yellow )
+		{
+			document.getElementById('yellow').style.backgroundColor = 'yellow';
+		}
+
+		if ( state.green )
+		{
+			document.getElementById('green').style.backgroundColor = 'green';
+		}
+
+	}
+}
+
+class SemaphoreModel extends EventTarget
+{
+	constructor()
+	{
+		super();
+
+		this.timer = 0;
+
+		this.redTime = 4;            
+		this.transitionTime = 1;
+		this.greenTime = 4;
+
+		this.redLightState = null;    
+		this.yellowLightState = null;
+		this.greenLightState = null;
+
+		this.isRunning = false;
+
+		this.setShutdownState();
+	}
+
+	getModelState()         //obtener estado del modelo
+	{
+		let state = 
+		{
+			red: this.redLightState,
+			yellow: this.yellowLightState,
+			green: this.greenLightState
+		}
+
+		return state;
+	}
+
+	setShutdownState()                         
+	{
+		this.redLightState = false;
+		this.yellowLightState = false;
+		this.greenLightState = false;
+		
+		this.dispatchEvent( new CustomEvent('changed') );
+	}
+
+	setRedToGreenTransitionState()             
+	{
+		this.redLightState = true;
+		this.yellowLightState = true;
+		this.greenLightState = false;
+
+		this.dispatchEvent( new CustomEvent('changed') );
+	}
+
+	setGreenLightState()                      
+	{
+		this.redLightState = false;
+		this.yellowLightState = false;
+		this.greenLightState = true;
+
+		this.dispatchEvent( new CustomEvent('changed') );
+	}
+
+	setRedLightState()                           
+	{
+		this.redLightState = true;
+		this.yellowLightState = false;
+		this.greenLightState = false;
+
+		this.dispatchEvent( new CustomEvent('changed') );
+	}
+
+	setGreenToRedTransitionState()                
+	{
+		this.redLightState = false;
+		this.yellowLightState = true;
+		this.greenLightState = true;
+		this.dispatchEvent( new CustomEvent('changed') );
+	}
+
+	onTickEventHandler(event)
+	{
+		this.timer++;                                    //una vez que recibe el tick, incrementa el contador
+
+		if ( this.timer >= 0 && this.timer < this.redTime )     //si el tiempo de timer es mayor a cero y menor a la de la luz roja , 
+		{
+			this.setRedLightState();                            //entonces se asigna el estado de la luz roja activo, la funcion setRedLightState() 
+		}
+
+		if ( this.timer >= this.redTime && this.timer < (this.redTime+this.transitionTime) )    //despues si es mayor al tiempo activo de la luz roja (4) y si el time es menor a la suma de 4+1=5 . es decir es 5 o mas, la luz pasa a ser amarilla por 1 segundo y asi...
+		{
+			this.setRedToGreenTransitionState();
+		}
+
+		if ( this.timer >= (this.redTime+this.transitionTime) && this.timer < (this.redTime+this.transitionTime+this.greenTime) )   
+		{
+			this.setGreenLightState();
+		}
+
+		if ( this.timer >= (this.redTime+this.transitionTime+this.greenTime) && this.timer <= (this.redTime+2*this.transitionTime+this.greenTime) )
+		{
+			this.setGreenToRedTransitionState();
+		}
+
+		if ( this.timer >= (this.redTime+2*this.transitionTime+this.greenTime) )
+		{
+			this.timer = 0;
+		}
+
+		console.log(this.timer);
+	}
+
+	run()
+	{
+		if ( !this.isRunning )
+		{
+			this.worker = new Worker("timer.js");
+			this.worker.addEventListener('message', this.onTickEventHandler.bind(this) );
+			this.isRunning = true;
+		}
+		else
+		{
+			console.log('Semaphore is running...');
+		}
+		
+	}
+
+	shutdown()   
+	{
+		if( this.isRunning )
+		{
+			this.worker.removeEventListener('message', this.onTickEventHandler );
+			this.worker.terminate();
+			this.setShutdownState();
+			this.isRunning = false;
+		}		
+	}
+}
+
+
+class MovingBox 
+{
+    constructor(model) {
+        this.model = model;
+       
+        this.canvas = document.createElement("canvas");
+        this.canvas.width = 1000;
+        this.canvas.height = 270;
+        this.context = this.canvas.getContext("2d");
+        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+
+        
+        this.box = {
+            width: 30,
+            height: 30,
+            color: "red",
+            x: 10,
+            y: 120
+        };
+        
+        this.interval = setInterval(() => this.update(), 10);
+
+        // Escuchar cambios del modelo
+        this.model.addEventListener('changed', () => this.stop());
+    }
+
+    stop() {
+    const state = this.model.getModelState();
+
+    if (state.red && this.interval) {
+        clearInterval(this.interval);
+        this.interval = null;
+    }
+    
+    else if (!state.red && !this.interval) {
+        this.interval = setInterval(() => this.update(), 2);
+    }
+	}
+
+
+    update() {
+        this.clear();
+        this.box.x += 1;
+
+        if (this.box.x > this.canvas.width) {
+            this.box.x = -this.box.width;
+        }
+
+        this.draw();
+    }
+
+    clear() {
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+
+    draw() {
+        this.context.fillStyle = this.box.color;
+        this.context.fillRect(this.box.x, this.box.y, this.box.width, this.box.height);
+    }
+}
+
+
+function main()
+{
+	let semaphore = new SemaphoreModel();
+	let view = new SemaphoreView(semaphore);
+	let box = new MovingBox(semaphore);
+
+	document.getElementById('on').onclick = () => semaphore.run();
+	document.getElementById('off').onclick = () => semaphore.shutdown();
+}
+
+window.onload = main;
+</script>
+</body>
+</html>
+semaforo-ref3.html
+Mostrando timer.js.
