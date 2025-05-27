@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Impresora</title>
+</head>
+<body>
+  <h3>Object: Monochrome Laser Printer</h3>
+  <table>
+    <tr>
+      <td>Content Toner</td>
+      <td><progress id="contentToner" value="0" max="100">100%</progress></td>
+    </tr>
+    <tr>
+      <td>Content Paper</td>
+      <td><progress id="contentPaper" value="0" max="50">100%</progress></td>
+    </tr>
+  </table>
+  <button id="printer">Print</button>
+
+  <script>
+    function getProperties(printer)
+   {
+      return {
+        contentToner: printer.contentToner,
+        capacityMaximaToner: printer.capacityMaximaToner,
+        contentPaper: printer.contentPaper,
+        capacityMaximaPaper: printer.capacityMaximaPaper
+      };
+    }
+
+    function updateGUI(data)
+   {
+      let tonerBar = document.getElementById("contentToner");
+      let paperBar = document.getElementById("contentPaper");
+
+      tonerBar.max = data.capacityMaximaToner;
+      tonerBar.value = data.contentToner;
+
+      paperBar.max = data.capacityMaximaPaper;
+      paperBar.value = data.contentPaper;
+    }
+
+    class Printer 
+   {
+      constructor()
+      {
+        this.capacityMaximaToner = 100;
+        this.contentToner = 50;
+
+        this.capacityMaximaPaper = 50;
+        this.contentPaper = 50;
+
+        this.quantityTonerUse = 5;
+        this.paperCountUse = 1;
+      }
+
+      printWithToner()
+      {
+        return this.contentToner >= (this.paperCountUse * this.quantityTonerUse);
+      }
+
+      printWithPaper() 
+      {
+        return this.contentPaper >= this.paperCountUse;
+      }
+
+      print()
+      {
+        let cantidad = parseInt(prompt("How many sheets do you want to print?"));
+        if (isNaN(cantidad) || cantidad <= 0) 
+        {
+          alert("Please enter a valid number.");
+          return;
+        }
+
+        this.paperCountUse = cantidad;
+
+        if (this.printWithPaper() && this.printWithToner()) 
+        {
+          this.contentPaper -= this.paperCountUse;
+          this.contentToner -= this.paperCountUse * this.quantityTonerUse;
+          updateGUI(getProperties(this));
+        } else {
+          alert("Not enough toner or paper to print.");
+        }
+      }
+    }
+
+    const myPrinter = new Printer();
+
+    document.getElementById("printer").addEventListener("click", function () {myPrinter.print();});
+
+    function main() 
+    {
+      updateGUI(getProperties(myPrinter));
+    }
+
+    window.onload = main;
+  </script>
+</body>
+</html>

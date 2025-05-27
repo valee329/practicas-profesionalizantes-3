@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Canvas Rectángulo</title>
+    <style>
+        body {
+            width: 50%;
+            height: 50%;
+            border: 2px solid black;
+        }
+    </style>
+</head>
+<body>
+<script>
+let canvas = document.createElement('canvas');
+canvas.width = 510;
+canvas.height = 400;
+document.body.appendChild(canvas);
+
+let ctx = canvas.getContext('2d');
+
+class Rectangle 
+{
+    constructor() 
+    {
+        this.x = 200;
+        this.y = 200;
+        this.width = 100;
+        this.height = 50;
+        this.angle = 0;
+    }
+
+    clearCanvas() 
+    {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    draw() 
+    {
+        this.clearCanvas();
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.angle);
+        ctx.fillStyle = 'blue';
+        ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
+        ctx.restore();
+    }
+
+    rotateLeft(radians) 
+    {
+        this.angle -= radians;
+        this.draw();
+    }
+
+    rotateRight(radians) 
+    {
+        this.angle += radians;
+        this.draw();
+    }
+
+    /*moveVertical(dy) 
+    {
+        this.y += dy;
+        this.draw();
+    }*/
+
+    advance() 
+    {
+        this.x += Math.cos(this.angle);
+        this.y += Math.sin(this.angle);
+        this.draw();
+    }
+
+    back() 
+    {
+        this.x -= Math.cos(this.angle);
+        this.y -= Math.sin(this.angle);
+        this.draw();
+    }
+
+ /*   moveHorizontal() 
+    {
+        this.x += dx;
+        this.draw();
+    }*/
+
+ /*   update() 
+    {
+        this.rotateRight(0.01);
+    } */
+}
+
+
+class RectangleController 
+{
+    constructor(rectangle) 
+    {
+        this.rectangle = rectangle;
+        this.keyDownHandler = this.keyDownHandler.bind(this);
+
+        document.addEventListener("keydown", this.keyDownHandler, false);
+    }
+
+    keyDownHandler(event) 
+    {
+        
+        switch (event.keyCode) {
+            case 38: 
+                this.rectangle.advance();
+                break;
+            case 40: 
+                this.rectangle.back();
+                break;
+            case 37:
+                this.rectangle.rotateLeft(0.1);
+                break;
+            case 39: 
+                this.rectangle.rotateRight(0.1);
+                break;
+        }
+    }
+}
+
+function main() 
+{
+    let rect = new Rectangle();
+    rect.draw();
+
+    let controller = new RectangleController(rect);
+
+    // setInterval(rect.update.bind(rect), 16);
+}
+
+window.onload = main;
+</script>
+</body>
+</html>
