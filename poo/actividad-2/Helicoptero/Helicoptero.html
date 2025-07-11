@@ -1,0 +1,113 @@
+<body>
+    <h3>Helicóptero de Guerra</h3>
+    <p>Combustible: <progress id="progressCombustible" value="100" max="100"></progress></p>
+    <p>Munición: <progress id="progressMunicion" value="5" max="10"></progress></p>
+    <button onclick="helicoptero.encender()">Encender</button>
+    <button onclick="helicoptero.volar()">Volar</button>
+    <button onclick="helicoptero.aterrizar()">Aterrizar</button>
+    <button onclick="helicoptero.disparar()">Disparar</button>
+    <button onclick="helicoptero.recargarCombustible()">Recarga de combustible</button>
+    <button onclick="helicoptero.recargarMunicion()">Recarga de municion</button>
+  
+    <script>
+
+    const ESTADOS = 
+    {
+    APAGADO: "apagado",
+    ENCENDIDO: "encendido",
+    VOLANDO: "volando",
+    COMBATIENDO: "combatiendo",
+    ATERRIZANDO: "aterrizando"
+    };
+
+
+      class HelicopteroDeGuerra 
+      {
+        constructor() 
+        {
+          this.estado = ESTADOS.APAGADO;
+          this.combustible = 100;
+          this.MaxCombuatible = 50;
+          this.municion = 5;
+          this.maxMunicion = 10;
+  
+          this.combustibleBar = document.getElementById("progressCombustible");
+          this.municionBar = document.getElementById("progressMunicion");
+  
+          this.actualizarUI();
+        }
+  
+        actualizarUI() 
+        {
+          this.combustibleBar.value = this.combustible;
+          this.municionBar.value = this.municion;
+        }
+
+        encender() 
+        {
+            if (this.estado === ESTADOS.APAGADO) {
+            this.estado = ESTADOS.ENCENDIDO;
+            alert("Helicoptero encendido.");
+            }
+        }
+        
+        volar() 
+        {if(this.estado === ESTADOS.ENCENDIDO && this.combustible > 10){
+          if (this.combustible >= 10) {
+            this.combustible -= 10;
+            this.estado = ESTADOS.VOLANDO;
+            }
+          } else {
+            alert("Primero debe encender.");
+          }
+          this.actualizarUI();
+        }
+  
+        disparar() 
+        {
+          if (this.municion > 0 && this.combustible >= 5) {
+            this.municion--;
+            this.combustible -= 10;
+            this.estado = ESTADOS.COMBATIENDO;
+            } else {
+            alert("Recargue municiones.");
+          }
+          this.actualizarUI();
+        }
+
+        recargarMunicion() 
+        {
+        const cantidad = parseInt(prompt("¿Cuánta munición desea cargar?"), 10);
+        if (!isNaN(cantidad) && cantidad > 0) {
+            this.municion = Math.min(this.municion + cantidad, this.maxMunicion);
+            alert("Munición recargada.");
+            this.actualizarUI();
+            }
+        }
+
+
+        recargarCombustible()
+        {
+        const cantidad = parseInt ( prompt( "¿Cuanto combustible desea recargar?"), 10);
+        if (!inNaN(cantidad) && cantidad > 0){
+            this.combustible = Math.min(this.combustible + cantidad, this.MaxCombuatible);
+            alert("Tanque Recargado.");
+            this.actualizarUI();
+            }
+        }
+
+        aterrizar()
+        {
+            if (this.estado === ESTADOS.ATERRIZANDO) {
+                this.estado = ESTADOS.ATERRIZANDO;
+                alert("Aterrizando...");
+            } 
+        }
+      }
+
+       //continuar solucionando: necesito que permanezca encendido ect
+  
+      const helicoptero = new HelicopteroDeGuerra();
+    </script>
+  </body>
+  

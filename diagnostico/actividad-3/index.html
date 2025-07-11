@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CALCULADORA</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <input id="display" type="text" readonly class="display">
+
+    <table>
+        <tr>
+            <td><button id="button7" class="button">7</button></td>
+            <td><button id="button8" class="button">8</button></td>
+            <td><button id="button9" class="button">9</button></td>
+            <td><button id="buttonSumar" class="buttonOperacion">+</button></td>
+        </tr>
+        <tr>
+            <td><button id="button4" class="button">4</button></td>
+            <td><button id="button5" class="button">5</button></td>
+            <td><button id="button6" class="button">6</button></td>
+            <td><button id="buttonMenos" class="buttonOperacion">-</button></td>
+        </tr>
+        <tr>
+            <td><button id="button3" class="button">3</button></td>
+            <td><button id="button2" class="button">2</button></td>
+            <td><button id="button1" class="button">1</button></td>
+            <td><button id="buttonMultiplicacion" class="buttonOperacion">*</button></td>
+        </tr>
+        <tr>
+            <td><button id="button0" class="button">0</button></td>
+            <td><button id="buttonPunto" class="button">.</button></td>
+            <td><button id="buttonIgual" class="buttonIgual">=</button></td>
+            <td><button id="buttonDivision" class="buttonOperacion">/</button></td>
+        </tr>
+    </table>
+
+    <button id="buttonBorrar" class="buttonBorrar">Borrar</button>
+
+    <script src="refactoring_calc.js"></script>
+</body>
+</html>

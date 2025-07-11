@@ -13,7 +13,7 @@
 </style>
 </head>
 <body>
-  
+  <h2>Sistemas de Ojetos 3</h2>
 <script type="text/javascript">
 
 class ApplicationUI extends HTMLElement 
@@ -162,9 +162,10 @@ class ApplicationUI extends HTMLElement
         this.table.appendChild(thead);
 
         const tbody = document.createElement('tbody');
+        this.tbody = tbody;
 
         // Ejemplo de fila
-        const exampleRow = document.createElement('tr');
+       /* const exampleRow = document.createElement('tr');
         const tdId = document.createElement('td');
         tdId.textContent = '1';
 
@@ -180,11 +181,12 @@ class ApplicationUI extends HTMLElement
         exampleRow.appendChild(tdId);
         exampleRow.appendChild(tdName);
         exampleRow.appendChild(tdRadio);
-        tbody.appendChild(exampleRow);
+        tbody.appendChild(exampleRow);*/
 
         this.table.appendChild(tbody);
         tablePanel.appendChild(this.table);
 
+       
         // ==== Assemble ====
         container.appendChild(sidebar);
         container.appendChild(canvasContainer);
@@ -212,6 +214,34 @@ class ApplicationUI extends HTMLElement
             this.dispatchEvent( new CustomEvent('createTriangleRequest') );
         }
       }
+
+      addFigureRow(id, tipo) 
+        {
+          const row = document.createElement('tr');
+
+          const tdId = document.createElement('td');
+          tdId.textContent = id;
+
+          const tdTipo = document.createElement('td');
+          tdTipo.textContent = tipo;
+
+          const tdRadio = document.createElement('td');
+          const radio = document.createElement('input');
+          radio.type = 'radio';
+          radio.name = 'figuraSeleccionada';
+          radio.addEventListener('change', () => {
+            this.dispatchEvent(new CustomEvent('figureSelected', {
+              detail: { id }
+            }));
+          });
+
+          tdRadio.appendChild(radio);
+          row.appendChild(tdId);
+          row.appendChild(tdTipo);
+          row.appendChild(tdRadio);
+          this.tbody.appendChild(row);
+        };
+
 
     static getDispatchedEvents()
     {
@@ -340,6 +370,8 @@ class Triangle
   }
 }
 
+
+
 class ApplicationController
 {
     constructor( view, model )
@@ -348,6 +380,9 @@ class ApplicationController
         this.model = model;
 
         this.ctx = this.view.getDrawingContext2D();
+
+        this.moveHandler = null; 
+
     }
 
     init()
@@ -356,18 +391,32 @@ class ApplicationController
         this.view.addEventListener('createRectangleRequest', this.onCreateRectangleButtonClick.bind(this) );
         this.view.addEventListener('createCircleRequest', this.onCreateCircleButtonClick.bind(this) );
         this.view.addEventListener('createTriangleRequest', this.onCreateTriangleButtonClick.bind(this) );
+      
+        this.view.addEventListener('figureSelected', (e) => {
+        const id = e.detail.id;
+
+      
+        if (this.moveHandler) {
+          this.moveHandler.destroy();
+        }
+
+        
+        this.moveHandler = new MoveObject(id, this.model);
+        });
+
       } 
 
-    release()
+    /*release()
     {
         //this.view.removeEventListener()
-    }
+    }*/
 
     //Estrategia 1: Procesar eventos de notificación del modelo
     onModelChanged(event)
     {
         //Clear
-        
+        this.ctx.clearRect(0, 0, this.view.canvas.width, this.view.canvas.height);
+
         //Drawing
         for( let object of this.model.getObjectIterator() )
         {
@@ -378,7 +427,7 @@ class ApplicationController
     //Manejadores de eventos producidos desde la UI
     onCreateRectangleButtonClick(event)
     {
-        //Datos pedidos al usuario
+        
         let id = prompt('Ingrese ID:');
         let width = prompt('Ingrese ancho:');
         let height = prompt('Ingrese alto:');
@@ -391,6 +440,8 @@ class ApplicationController
         //Acceso al modelo
         let new_figure = new Rectangle(x,y,width,height,color);
         this.model.addObject(id, new_figure);
+
+        this.view.addFigureRow(id, 'Rectangulo');
 
     }
 
@@ -405,6 +456,9 @@ class ApplicationController
 
       let new_figure = new Circle(x,y,radio,color);
       this.model.addObject(id, new_figure);
+
+      this.view.addFigureRow(id, 'Circulo');
+
     }
 
     onCreateTriangleButtonClick(event)
@@ -423,42 +477,50 @@ class ApplicationController
 
         let new_figure = new Triangle(x1,y1,x2,y2,x3,y3,x,y,color);
         this.model.addObject(id, new_figure);
+
+        this.view.addFigureRow(id, 'Triangulo');
+
     }
 }
 
-class MoveObject
-{
-  constructor(id, model)
-  {
-    this.table = document.createElement('table');
-    let figura = this.model.getObject(id);
-    this.keyDownHandler = this.keyDownHandler.bind(this);
+class MoveObject {
+  constructor(id, model) {
+    this.model = model;
     this.selectedObject = this.model.getObject(id);
+    this.keyDownHandler = this.keyDownHandler.bind(this);
 
-    document.addEventListener("keydown", this.keyDownHandler, false);
-
+    document.addEventListener("keydown", this.keyDownHandler);
   }
 
-  keyDownHandler(event) 
-  {
-        
-    switch (event.keyCode) {
-        case 38: 
-          this.selectedObject.advance();
-          break;
-        case 40: 
-          this.selectedObject.back();
-          break;
-        case 37:
-          this.selectedObject.rotateLeft(0.1);
-          break;
-        case 39: 
-          this.selectedObject.rotateRight(0.1);
-          break;
-      }
+  keyDownHandler(event) {
+    if (!this.selectedObject) return;
+
+    const paso = 5;
+
+    switch (event.key) {
+      case 'ArrowUp':
+        this.selectedObject.y -= paso;
+        break;
+      case 'ArrowDown':
+        this.selectedObject.y += paso;
+        break;
+      case 'ArrowLeft':
+        this.selectedObject.x -= paso;
+        break;
+      case 'ArrowRight':
+        this.selectedObject.x += paso;
+        break;
+    }
+
+    
+    this.model.dispatchEvent(new CustomEvent('modelchanged'));
   }
 
-};
+  destroy() {
+    document.removeEventListener("keydown", this.keyDownHandler);
+  }
+}
+
 
 
 
@@ -474,7 +536,7 @@ function main()
 }
 
 window.onload = main;
-
+// la cague ,porque se movia. ahora tengoo que lograr que vuelva a moverse la figura y no deje rastro. y que se mueve para todos lados no solo hacia adelante
 </script>
 </html>
 index-wc.html

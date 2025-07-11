@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Ventilador</title>
+</head>
+<body>
+
+  <h1>Ventilador</h1>
+
+  <button onclick="ventilador.encender()">Encender</button>
+  <button onclick="ventilador.apagar()">Apagar</button>
+  <br><br>
+  <label for="velocidad">Velocidad: </label>
+  <select id="velocidad" onchange="cambiarVelocidad()">
+    <option value="0">Apagado</option>
+    <option value="1">Baja</option>
+    <option value="2">Media</option>
+    <option value="3">Alta</option>
+  </select>
+
+  <p id="estado"></p>
+
+  <script>
+
+class Ventilador 
+{
+  constructor(motor, paletas, base) {
+    this.motor = motor;
+    this.paletas = paletas;
+    this.base = base;
+    this.encendido = false;
+    this.velocidad = 0; 
+  }
+
+  encender() 
+  {
+    if (!this.encendido) {
+      this.encendido = true;
+      if (this.velocidad === 0) this.velocidad = 1; 
+      this.actualizarEstado();
+    }
+  }
+
+  apagar() 
+  {
+    this.encendido = false;
+    this.velocidad = 0;
+    this.actualizarEstado();
+  }
+
+  cambiarVelocidad(nuevaVelocidad) 
+  {
+    if (nuevaVelocidad >= 0 && nuevaVelocidad <= 3) {
+      this.velocidad = nuevaVelocidad;
+      this.encendido = nuevaVelocidad > 0;
+      this.actualizarEstado();
+    }
+  }
+
+  actualizarEstado() 
+  {
+    const estado = document.getElementById("estado");
+    if (!this.encendido) {
+      estado.innerText = "El ventilador está apagado.";
+    } else {
+      let textoVel = ["Apagado", "Baja", "Media", "Alta"];
+      estado.innerText = `Ventilador encendido. Velocidad: ${textoVel[this.velocidad]}`;
+    }
+  }
+}
+
+const ventilador = new Ventilador("Motor eléctrico", "3 paletas", "Base metálica");
+
+
+window.ventilador = ventilador;
+
+
+window.cambiarVelocidad = function () 
+{
+  const nuevaVel = parseInt(document.getElementById("velocidad").value);
+  ventilador.cambiarVelocidad(nuevaVel);
+};
+
+
+  </script>
+</body>
+</html>

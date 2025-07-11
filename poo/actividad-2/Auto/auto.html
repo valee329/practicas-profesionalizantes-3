@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Auto</title>
+</head>
+<body>
+
+<script>
+  const auto = {
+
+    marca: "Toyota",
+    modelo: "Corolla",
+    color: "Azul",
+    encendido: false,
+    velocidad: 0,
+
+
+    encender() {
+      if (!this.encendido) {
+        this.encendido = true;
+        alert("El auto está encendido.");
+      } else {
+        alert("El auto ya está encendido.");
+      }
+    },
+
+    apagar() {
+      if (this.encendido && this.velocidad === 0) {
+        this.encendido = false;
+        alert("El auto se ha apagado.");
+      } else if (this.velocidad > 0) {
+        alert("No se puede apagar el auto mientras está en movimiento.");
+      } else {
+        alert("El auto ya está apagado.");
+      }
+    },
+
+    acelerar() {
+      if (this.encendido) {
+        this.velocidad += 10;
+        alert(`Acelerando... Velocidad actual: ${this.velocidad} km/h`);
+      } else {
+        alert("No se puede acelerar. El auto está apagado.");
+      }
+    },
+
+    frenar() {
+      if (this.velocidad > 0) {
+        this.velocidad -= 10;
+        alert(`Frenando... Velocidad actual: ${this.velocidad} km/h`);
+      } else {
+        alert("El auto ya está detenido.");
+      }
+    },
+
+    mostrarEstado() {
+      alert(
+        `Estado del Auto:\nMarca: ${this.marca}\nModelo: ${this.modelo}\nColor: ${this.color}\nEncendido: ${this.encendido ? "Sí" : "No"}\nVelocidad: ${this.velocidad} km/h`
+      );
+    }
+  };
+
+  
+  function menuAuto() {
+    let opcion;
+    do {
+      opcion = prompt(
+        "Seleccione una opción:\n" +
+        "1. Mostrar estado\n" +
+        "2. Encender\n" +
+        "3. Acelerar\n" +
+        "4. Frenar\n" +
+        "5. Apagar\n" +
+        "6. Salir"
+      );
+
+      switch (opcion) {
+        case "1":
+          auto.mostrarEstado();
+          break;
+        case "2":
+          auto.encender();
+          break;
+        case "3":
+          auto.acelerar();
+          break;
+        case "4":
+          auto.frenar();
+          break;
+        case "5":
+          auto.apagar();
+          break;
+        case "6":
+          alert("Saliendo del simulador.");
+          break;
+        default:
+          alert("Opción no válida.");
+      }
+
+    } while (opcion !== "6");
+  }
+
+
+  menuAuto();
+</script>
+
+</body>
+</html>
